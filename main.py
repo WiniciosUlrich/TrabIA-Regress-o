@@ -69,7 +69,7 @@ for i, (nome, dados) in enumerate(datasets.items()):
     ax.scatter(x, y, color=cor, alpha=0.7, s=60, edgecolors='black', linewidth=0.5, label='Dados')
     
     # LINHA DE REGRESSÃO (obrigatória) 
-    x_linha = np.linspace(min(x), max(x), 100)  # Cria pontos suaves
+    x_linha = np.linspace(min(x), max(x), 2)  # Cria pontos suaves
     y_linha = beta0 + beta1 * x_linha           # Aplica equação da reta
     ax.plot(x_linha, y_linha, color='black', linewidth=2, linestyle='--', 
             label=f'y = {beta0:.2f} + {beta1:.2f}x')
