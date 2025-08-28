@@ -60,15 +60,15 @@ def eh_apropriado_para_regressao(x):
 # Os datasets representam diferentes cenários de correlação
 datasets = {
     "Dataset 1": (
-        [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5],  # Variável independente (x)
-        [8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68]  # Variável dependente (y)
+        [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5], 
+        [8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68] 
     ),
     "Dataset 2": (
-        [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5],  # Mesmo x do Dataset 1
-        [9.14, 8.14, 8.47, 8.77, 9.26, 8.10, 6.13, 3.10, 9.13, 7.26, 4.74]  # y diferente
+        [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5],  
+        [9.14, 8.14, 8.47, 8.77, 9.26, 8.10, 6.13, 3.10, 9.13, 7.26, 4.74]  
     ),
     "Dataset 3": (
-        [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 19],  # x quase constante (caso problemático)
+        [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 19],  
         [6.58, 5.76, 7.71, 8.84, 8.47, 7.04, 5.25, 5.56, 7.91, 6.89, 12.50]
     )
 }
@@ -90,21 +90,5 @@ for nome, (x, y) in datasets.items():
     print(f"Equação da reta: y = {b0:.4f} + {b1:.4f}*x")
     print(f"Coeficiente β0 (intercepto): {b0:.4f}")
     print(f"Coeficiente β1 (inclinação): {b1:.4f}")
-    print("Apropriado para regressão linear?", "✓ Sim" if apropriado else "❌ Não")
-
+    print("Apropriado para regressão linear?", "Sim" if apropriado else "Não")
 # ===============================
-# Interpretação dos Resultados
-# ===============================
-
-print("\n=== INTERPRETAÇÃO ===")
-print("• Correlação próxima de 1: relação linear positiva forte")
-print("• Correlação próxima de -1: relação linear negativa forte") 
-print("• Correlação próxima de 0: pouca ou nenhuma relação linear")
-print("\n• β1 positivo: y aumenta quando x aumenta")
-print("• β1 negativo: y diminui quando x aumenta")
-print("• β0: valor estimado de y quando x = 0")
-
-print("\n=== OBSERVAÇÃO IMPORTANTE ===")
-print("O Dataset 3 apresenta problema: valores de x quase constantes (8, 8, 8..., 19)")
-print("Isso viola a premissa da regressão linear de ter variabilidade em x,")
-print("tornando a análise estatisticamente inadequada para este conjunto.")
