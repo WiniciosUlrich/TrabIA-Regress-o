@@ -43,7 +43,7 @@ datasets = {
         "cor": "red"
     },
     "Dataset 3": {
-        "x": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 19],  # 10 valores = 8, 1 valor = 19
+        "x": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 19],  
         "y": [6.58, 5.76, 7.71, 8.84, 8.47, 7.04, 5.25, 5.56, 7.91, 6.89, 12.50],
         "cor": "green"
     }
@@ -93,3 +93,6 @@ for i, (nome, dados) in enumerate(datasets.items()):
 # EXIBE OS GRÁFICOS
 plt.tight_layout()
 plt.show()
+
+# O unico dataset que foge do padrão é o Dataset 3, onde todos os valores de x são iguais (8), exceto um valor atípico (19).
+# Isso resulta em uma correlação indefinida, pois a variância de x é zero
