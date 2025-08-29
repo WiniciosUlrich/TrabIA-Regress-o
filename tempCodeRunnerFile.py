@@ -1,1 +1,0 @@
-y_linha = beta0 + beta1 * x_linha
