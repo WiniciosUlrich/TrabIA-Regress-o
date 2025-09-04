@@ -150,7 +150,7 @@ print("=" * 50)
 beta0_mult, beta1_mult, beta2_mult = regressao_multipla(X, y)
 print(f"y = {beta0_mult:.0f} + {beta1_mult:.2f}x₁ + {beta2_mult:.0f}x₂")
 print(f"(x₁=tamanho, x₂=quartos, y=preço)")
-
+# ...existing code...
 # =============================================================================
 # f) GRÁFICO 3D
 # =============================================================================
@@ -174,9 +174,22 @@ ax.plot_surface(T, Q, P, alpha=0.3, color='red')
 ax.set_xlabel('Tamanho (sq ft)')
 ax.set_ylabel('Quartos')
 ax.set_zlabel('Preço ($)')
-ax.set_title('Regressão Múltipla 3D')
+
+# g) REQUISITO G: Mostrar coeficientes de correlação no gráfico 3D
+correlation_text = f'Correlações:\nTamanho-Preço: r = {r_tamanho:.3f}\nQuartos-Preço: r = {r_quartos:.3f}'
+ax.text2D(0.02, 0.98, correlation_text, transform=ax.transAxes, 
+          fontsize=10, verticalalignment='top', 
+          bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+
+ax.set_title('Regressão Múltipla 3D - com Coeficientes de Correlação')
 
 plt.show()
+
+print("\ng) COEFICIENTES DE CORRELAÇÃO MOSTRADOS NO GRÁFICO 3D")
+print("=" * 50)
+print(f"✓ Tamanho vs Preço: r = {r_tamanho:.4f}")
+print(f"✓ Quartos vs Preço: r = {r_quartos:.4f}")
+print("✓ Valores exibidos no gráfico 3D")
 
 # =============================================================================
 # h) PREDIÇÃO ESPECÍFICA
