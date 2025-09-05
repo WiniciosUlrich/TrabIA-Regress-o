@@ -237,5 +237,5 @@ print(f"  Sklearn: ${preco_sklearn:.0f}")
 print(f"  Diferença: ${abs(preco_predito - preco_sklearn):.0f}")
 
 # Qualidade do modelo
-r2 = r2_score(y, modelo_sklearn.predict(X))
-print(f"\nR² Score: {r2:.4f} ({r2*100:.1f}% da variância explicada)")
+# r2 = r2_score(y, modelo_sklearn.predict(X))
+# print(f"\nR² Score: {r2:.4f} ({r2*100:.1f}% da variância explicada)")
