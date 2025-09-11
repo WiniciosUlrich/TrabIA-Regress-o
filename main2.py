@@ -150,7 +150,7 @@ print("=" * 50)
 beta0_mult, beta1_mult, beta2_mult = regressao_multipla(X, y)
 print(f"y = {beta0_mult:.0f} + {beta1_mult:.2f}x₁ + {beta2_mult:.0f}x₂")
 print(f"(x₁=tamanho, x₂=quartos, y=preço)")
-# ...existing code...
+
 # =============================================================================
 # f) GRÁFICO 3D
 # =============================================================================
@@ -236,6 +236,3 @@ print(f"  Nossa: ${preco_predito:.0f}")
 print(f"  Sklearn: ${preco_sklearn:.0f}")
 print(f"  Diferença: ${abs(preco_predito - preco_sklearn):.0f}")
 
-# Qualidade do modelo
-# r2 = r2_score(y, modelo_sklearn.predict(X))
-# print(f"\nR² Score: {r2:.4f} ({r2*100:.1f}% da variância explicada)")
