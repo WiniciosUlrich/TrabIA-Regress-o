@@ -268,4 +268,43 @@ for grau in graus:                               # Para cada grau
     
     print(f"   Grau {grau}: Δ = {diferenca:.4f} {status}")  # Mostra análise
 
-# Restante do código continua com mais análises e conclusões...
+print("\n2. MODELO MAIS PRECISO:")
+print(f"   • Melhor no treino (R²): Grau {max(graus, key=lambda g: r2_score(y_train, calcular_polinomio(X_train, coeficientes_treino[g])))}")
+print(f"   • Melhor no teste (R²): Grau {max(graus, key=lambda g: r2_score(y_test, calcular_polinomio(X_test, coeficientes_treino[g])))}")
+print(f"   • Menor EQM no teste: Grau {melhor_grau_teste}")
+
+print("\n3. CONCLUSÃO:")
+print("   O modelo de grau mais alto pode ter melhor desempenho nos dados")
+print("   de treino, mas pode ter pior generalização (overfitting).")
+print("   O modelo ideal equilibra precisão e capacidade de generalização.")
+
+# Gráfico comparativo final
+plt.figure(figsize=(12, 8))
+
+graus_plot = list(range(1, 9))
+r2_treino_plot = []
+r2_teste_plot = []
+
+for g in graus_plot:
+    if g in graus:
+        coef = coeficientes_treino[g]
+    else:
+        coef = np.polyfit(X_train, y_train, g)
+    
+    y_pred_tr = calcular_polinomio(X_train, coef)
+    y_pred_te = calcular_polinomio(X_test, coef)
+    
+    r2_treino_plot.append(r2_score(y_train, y_pred_tr))
+    r2_teste_plot.append(r2_score(y_test, y_pred_te))
+
+plt.plot(graus_plot, r2_treino_plot, 'o-', color='blue', label='R² Treino', linewidth=2)
+plt.plot(graus_plot, r2_teste_plot, 's-', color='red', label='R² Teste', linewidth=2)
+plt.xlabel('Grau do Polinômio')
+plt.ylabel('Coeficiente de Determinação (R²)')
+plt.title('Comparação R² - Treino vs Teste (Detecção de Overfitting)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.xticks(graus_plot)
+plt.show()
+
+print(f"\n✓ Script concluído! Modelo recomendado: Grau {melhor_grau_teste}")
