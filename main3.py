@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt  # Para criação de gráficos
 import numpy as np              # Para operações matemáticas e arrays
 import pandas as pd             # Para manipulação de dados
-from sklearn.metrics import r2_score, mean_squared_error  # Métricas de avaliação
+from sklearn.metrics import r2_score  # Apenas R² da sklearn
 from sklearn.model_selection import train_test_split     # Divisão treino/teste
 
 # =============================================================================
@@ -22,6 +22,16 @@ def calcular_polinomio(x, coeficientes):
     
     return y                                       # Retorna valores calculados
 
+def calcular_eqm(y_real, y_pred):
+    """
+    Calcula o Erro Quadrático Médio (EQM) manualmente
+    EQM = (1/n) * Σ(y_real - y_pred)²
+    """
+    n = len(y_real)                                # Número de amostras
+    erro_quadratico = (y_real - y_pred) ** 2       # Calcula erro quadrático
+    eqm = np.sum(erro_quadratico) / n              # Média dos erros quadráticos
+    return eqm                                     # Retorna EQM
+
 def exibir_equacao(coeficientes, grau):
     """Exibe a equação do polinômio de forma legível"""
     eq = "y = "                                    # Inicia string da equação
@@ -40,6 +50,21 @@ def exibir_equacao(coeficientes, grau):
             eq += f"{coef:.4f}x^{potencia}"
     
     return eq                                      # Retorna equação formatada
+
+def avaliar_modelo(y_real, y_pred):
+    """
+    Avalia modelo considerando EQM (próximo de 0) e R² (próximo de 1)
+    Retorna um score combinado para comparação
+    """
+    eqm = calcular_eqm(y_real, y_pred)            # Calcula EQM
+    r2 = r2_score(y_real, y_pred)                 # Calcula R²
+    
+    # Score combinado: R² alto e EQM baixo = score alto
+    # Normaliza EQM para evitar que domine o score
+    eqm_normalizado = 1 / (1 + eqm)               # Transforma EQM em valor entre 0 e 1
+    score = (r2 + eqm_normalizado) / 2            # Média entre R² e EQM normalizado
+    
+    return score, eqm, r2                         # Retorna score, EQM e R²
 
 # =============================================================================
 # a) CARREGAMENTO DOS DADOS
@@ -138,7 +163,7 @@ eqm_dict = {}                                    # Dicionário para armazenar EQ
 for grau in graus:                               # Para cada grau
     coeficientes = coeficientes_dict[grau]       # Pega coeficientes
     y_pred = calcular_polinomio(x_data, coeficientes)  # Calcula predições
-    eqm = mean_squared_error(y_data, y_pred)     # ✓ Calcula EQM
+    eqm = calcular_eqm(y_data, y_pred)           # ✓ Calcula EQM com função manual
     eqm_dict[grau] = eqm                         # Armazena EQM
     print(f"Grau {grau}: EQM = {eqm:.6f}")       # Mostra EQM
 
@@ -203,12 +228,12 @@ eqm_teste_dict = {}                              # Dicionário para EQM do teste
 for grau in graus:                               # Para cada grau
     coeficientes = coeficientes_treino[grau]     # Pega coeficientes do treino
     y_pred_teste = calcular_polinomio(X_test, coeficientes)  # ✓ Predições apenas no teste
-    eqm_teste = mean_squared_error(y_test, y_pred_teste)     # ✓ EQM apenas no teste
+    eqm_teste = calcular_eqm(y_test, y_pred_teste)     # ✓ EQM manual apenas no teste
     eqm_teste_dict[grau] = eqm_teste             # Armazena EQM
     print(f"Grau {grau}: EQM (teste) = {eqm_teste:.6f}")    # Mostra EQM
 
 melhor_grau_teste = min(eqm_teste_dict, key=eqm_teste_dict.get)  # Melhor grau no teste
-print(f"\n✓ Modelo mais preciso no teste: Grau {melhor_grau_teste}")
+print(f"\n✓ Modelo mais preciso no teste (menor EQM): Grau {melhor_grau_teste}")
 
 # =============================================================================
 # k) COEFICIENTE DE DETERMINAÇÃO (R²)
@@ -219,6 +244,11 @@ print("=" * 60)
 
 print(f"{'Grau':<6} {'R² Treino':<12} {'R² Teste':<12} {'EQM Treino':<12} {'EQM Teste'}")  # Cabeçalho tabela
 print("-" * 60)
+
+# Dicionários para análise completa
+r2_treino_dict = {}                              # R² treino
+r2_teste_dict = {}                               # R² teste
+eqm_treino_dict = {}                             # EQM treino
 
 for grau in graus:                               # Para cada grau
     coeficientes = coeficientes_treino[grau]     # Pega coeficientes
@@ -231,9 +261,14 @@ for grau in graus:                               # Para cada grau
     r2_treino = r2_score(y_train, y_pred_treino)    # ✓ R² do treino
     r2_teste = r2_score(y_test, y_pred_teste)       # ✓ R² do teste
     
-    # EQM
-    eqm_treino = mean_squared_error(y_train, y_pred_treino)    # EQM treino
-    eqm_teste = mean_squared_error(y_test, y_pred_teste)       # EQM teste
+    # EQM com função manual
+    eqm_treino = calcular_eqm(y_train, y_pred_treino)    # EQM treino manual
+    eqm_teste = calcular_eqm(y_test, y_pred_teste)       # EQM teste manual
+    
+    # Armazenar para análise posterior
+    r2_treino_dict[grau] = r2_treino
+    r2_teste_dict[grau] = r2_teste
+    eqm_treino_dict[grau] = eqm_treino
     
     print(f"{grau:<6} {r2_treino:<12.4f} {r2_teste:<12.4f} {eqm_treino:<12.6f} {eqm_teste:<12.6f}")  # Mostra resultados
 
@@ -250,12 +285,8 @@ print("━" * 40)
 # Análise de overfitting
 print("\n1. COMPARAÇÃO R² TREINO vs TESTE:")
 for grau in graus:                               # Para cada grau
-    coeficientes = coeficientes_treino[grau]     # Pega coeficientes
-    y_pred_treino = calcular_polinomio(X_train, coeficientes)  # Predições treino
-    y_pred_teste = calcular_polinomio(X_test, coeficientes)    # Predições teste
-    
-    r2_treino = r2_score(y_train, y_pred_treino)    # R² treino
-    r2_teste = r2_score(y_test, y_pred_teste)       # R² teste
+    r2_treino = r2_treino_dict[grau]             # R² treino
+    r2_teste = r2_teste_dict[grau]               # R² teste
     
     diferenca = r2_treino - r2_teste             # Diferença entre R²
     
@@ -268,19 +299,46 @@ for grau in graus:                               # Para cada grau
     
     print(f"   Grau {grau}: Δ = {diferenca:.4f} {status}")  # Mostra análise
 
-print("\n2. MODELO MAIS PRECISO:")
-print(f"   • Melhor no treino (R²): Grau {max(graus, key=lambda g: r2_score(y_train, calcular_polinomio(X_train, coeficientes_treino[g])))}")
-print(f"   • Melhor no teste (R²): Grau {max(graus, key=lambda g: r2_score(y_test, calcular_polinomio(X_test, coeficientes_treino[g])))}")
-print(f"   • Menor EQM no teste: Grau {melhor_grau_teste}")
+print("\n2. AVALIAÇÃO COMPLETA DOS MODELOS (EQM próximo de 0 e R² próximo de 1):")
+print("━" * 70)
 
-print("\n3. CONCLUSÃO:")
-print("   O modelo de grau mais alto pode ter melhor desempenho nos dados")
-print("   de treino, mas pode ter pior generalização (overfitting).")
-print("   O modelo ideal equilibra precisão e capacidade de generalização.")
+# Avaliar cada modelo considerando EQM e R² conjuntamente
+scores_teste = {}                                # Scores dos modelos no teste
+for grau in graus:                               # Para cada grau
+    coeficientes = coeficientes_treino[grau]     # Pega coeficientes
+    y_pred_teste = calcular_polinomio(X_test, coeficientes)    # Predições teste
+    
+    score, eqm, r2 = avaliar_modelo(y_test, y_pred_teste)     # Avalia modelo
+    scores_teste[grau] = score                   # Armazena score
+    
+    print(f"   Grau {grau}: R²={r2:.4f} | EQM={eqm:.6f} | Score={score:.4f}")
+
+# Encontrar melhor modelo baseado no score combinado
+melhor_modelo_completo = max(scores_teste, key=scores_teste.get)
+
+print("\n3. RANKING DOS MODELOS:")
+print("━" * 30)
+
+# Ordenar modelos por score (melhor primeiro)
+ranking = sorted(scores_teste.items(), key=lambda x: x[1], reverse=True)
+for i, (grau, score) in enumerate(ranking, 1):
+    r2_teste = r2_teste_dict[grau]
+    eqm_teste = eqm_teste_dict[grau]
+    print(f"   {i}º lugar: Grau {grau} (Score: {score:.4f}, R²: {r2_teste:.4f}, EQM: {eqm_teste:.6f})")
+
+print("\n4. CONCLUSÃO FINAL:")
+print("━" * 25)
+print(f"   • Melhor modelo no teste (apenas R²): Grau {max(r2_teste_dict, key=r2_teste_dict.get)}")
+print(f"   • Melhor modelo no teste (apenas EQM): Grau {min(eqm_teste_dict, key=eqm_teste_dict.get)}")
+print(f"   • Melhor modelo COMPLETO (EQM+R²): Grau {melhor_modelo_completo}")
+print(f"\n   RECOMENDAÇÃO: Use o modelo de Grau {melhor_modelo_completo}")
+print("   que equilibra R² alto (próximo de 1) e EQM baixo (próximo de 0)")
 
 # Gráfico comparativo final
-plt.figure(figsize=(12, 8))
+plt.figure(figsize=(15, 5))
 
+# Subplot 1: R² Treino vs Teste
+plt.subplot(1, 3, 1)
 graus_plot = list(range(1, 9))
 r2_treino_plot = []
 r2_teste_plot = []
@@ -300,11 +358,63 @@ for g in graus_plot:
 plt.plot(graus_plot, r2_treino_plot, 'o-', color='blue', label='R² Treino', linewidth=2)
 plt.plot(graus_plot, r2_teste_plot, 's-', color='red', label='R² Teste', linewidth=2)
 plt.xlabel('Grau do Polinômio')
-plt.ylabel('Coeficiente de Determinação (R²)')
-plt.title('Comparação R² - Treino vs Teste (Detecção de Overfitting)')
+plt.ylabel('R²')
+plt.title('R² - Treino vs Teste')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.xticks(graus_plot)
+
+# Subplot 2: EQM Treino vs Teste
+plt.subplot(1, 3, 2)
+eqm_treino_plot = []
+eqm_teste_plot = []
+
+for g in graus_plot:
+    if g in graus:
+        coef = coeficientes_treino[g]
+    else:
+        coef = np.polyfit(X_train, y_train, g)
+    
+    y_pred_tr = calcular_polinomio(X_train, coef)
+    y_pred_te = calcular_polinomio(X_test, coef)
+    
+    eqm_treino_plot.append(calcular_eqm(y_train, y_pred_tr))
+    eqm_teste_plot.append(calcular_eqm(y_test, y_pred_te))
+
+plt.plot(graus_plot, eqm_treino_plot, 'o-', color='blue', label='EQM Treino', linewidth=2)
+plt.plot(graus_plot, eqm_teste_plot, 's-', color='red', label='EQM Teste', linewidth=2)
+plt.xlabel('Grau do Polinômio')
+plt.ylabel('EQM')
+plt.title('EQM - Treino vs Teste')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.xticks(graus_plot)
+
+# Subplot 3: Score Combinado
+plt.subplot(1, 3, 3)
+scores_plot = []
+
+for g in graus_plot:
+    if g in graus:
+        coef = coeficientes_treino[g]
+    else:
+        coef = np.polyfit(X_train, y_train, g)
+    
+    y_pred_te = calcular_polinomio(X_test, coef)
+    score, _, _ = avaliar_modelo(y_test, y_pred_te)
+    scores_plot.append(score)
+
+plt.plot(graus_plot, scores_plot, 'o-', color='green', label='Score Combinado', linewidth=2)
+plt.axvline(x=melhor_modelo_completo, color='red', linestyle='--', alpha=0.7, label=f'Melhor (Grau {melhor_modelo_completo})')
+plt.xlabel('Grau do Polinômio')
+plt.ylabel('Score (R² + EQM normalizado)')
+plt.title('Score Combinado (Melhor Modelo)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.xticks(graus_plot)
+
+plt.tight_layout()
 plt.show()
 
-print(f"\n✓ Script concluído! Modelo recomendado: Grau {melhor_grau_teste}")
+print(f"\n✓ Script concluído! Modelo recomendado: Grau {melhor_modelo_completo}")
+print(f"  (R² = {r2_teste_dict[melhor_modelo_completo]:.4f}, EQM = {eqm_teste_dict[melhor_modelo_completo]:.6f})")
