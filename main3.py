@@ -1,3 +1,4 @@
+#Alunos: Winicios Ivan Ulrich, Mateus Fritzen, Gabriel Puff
 import matplotlib.pyplot as plt  # Para criação de gráficos
 import numpy as np              # Para operações matemáticas e arrays
 import pandas as pd             # Para manipulação de dados

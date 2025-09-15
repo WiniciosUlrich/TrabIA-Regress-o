@@ -1,3 +1,4 @@
+#Alunos: Winicios Ivan Ulrich, Mateus Fritzen, Gabriel Puff
 import matplotlib.pyplot as plt
 import numpy as np
 
